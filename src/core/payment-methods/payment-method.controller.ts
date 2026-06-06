@@ -7,27 +7,27 @@ import {
 } from '@dad-group-1/backend-common';
 import { PaymentMethodService } from './payment-method.service';
 
-@Controller('payment')
+@Controller('payment-methods')
 export class PaymentMethodController {
   private readonly logger = new Logger(PaymentMethodController.name);
   constructor(private readonly paymentMethodService: PaymentMethodService) {}
 
-  @MessagePattern({ cmd: 'create_attendance' })
+  @MessagePattern({ cmd: 'create_payment_method' })
   async create(@Payload() data: CreatePaymentMethodRequestDto) {
     return this.paymentMethodService.create(data);
   }
 
-  @MessagePattern({ cmd: 'find_all_attendances' })
+  @MessagePattern({ cmd: 'find_all_payment_methods' })
   findAll(query: PaginationQueryDto) {
     return this.paymentMethodService.findAll(query);
   }
 
-  @MessagePattern({ cmd: 'find_one_attendance' })
+  @MessagePattern({ cmd: 'find_one_payment_method' })
   findOne(@Payload() id: number) {
     return this.paymentMethodService.findOne(id);
   }
 
-  @MessagePattern({ cmd: 'update_attendance' })
+  @MessagePattern({ cmd: 'update_payment_method' })
   update(
     @Payload()
     payload: {
@@ -38,7 +38,7 @@ export class PaymentMethodController {
     return this.paymentMethodService.update(payload.id, payload.updateData);
   }
 
-  @MessagePattern({ cmd: 'remove_attendance' })
+  @MessagePattern({ cmd: 'remove_payment_method' })
   remove(@Payload() id: number) {
     return this.paymentMethodService.remove(id);
   }

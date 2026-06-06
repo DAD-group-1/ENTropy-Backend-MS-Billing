@@ -17,22 +17,24 @@ export class PaymentMethodService {
 
   constructor(
     @InjectRepository(PaymentMethod)
-    private attendanceRepository: Repository<PaymentMethod>,
+    private paymentMethodRepository: Repository<PaymentMethod>,
   ) {}
 
   async create(
     createData: CreatePaymentMethodRequestDto,
   ): Promise<PaymentMethodResponseDto> {
-    const attendance = this.attendanceRepository.create({ ...createData });
+    const paymentMethod = this.paymentMethodRepository.create({
+      ...createData,
+    });
     try {
-      return await this.attendanceRepository.save(attendance);
+      return await this.paymentMethodRepository.save(paymentMethod);
     } catch (error) {
       this.logger.error(
-        `${error.constructor.name}: Failed to create attendance record - ${error.message}`,
+        `${error.constructor.name}: Failed to create payment method record - ${error.message}`,
         error.stack,
       );
       throw new RpcException({
-        message: `Failed to create attendance record`,
+        message: `Failed to create payment method record`,
         code: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
@@ -44,7 +46,7 @@ export class PaymentMethodService {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.attendanceRepository.findAndCount({
+    const [data, total] = await this.paymentMethodRepository.findAndCount({
       skip,
       take: limit,
       order: { id: 'DESC' },
@@ -54,28 +56,28 @@ export class PaymentMethodService {
   }
 
   async findOne(id: number): Promise<PaymentMethodResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id: id },
     });
 
-    if (!attendance) {
+    if (!paymentMethod) {
       throw new RpcException({
         message: `PaymentMethod with ID ${id} not found`,
         code: HttpStatus.NOT_FOUND,
       });
     }
 
-    return attendance;
+    return paymentMethod;
   }
 
   async update(
     id: number,
     updateData: UpdatePaymentMethodRequestDto,
   ): Promise<PaymentMethodResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id: id },
     });
-    if (!attendance) {
+    if (!paymentMethod) {
       this.logger.error(`PaymentMethod with ID ${id} not found for update`);
       throw new RpcException({
         message: `PaymentMethod with ID ${id} not found`,
@@ -83,15 +85,15 @@ export class PaymentMethodService {
       });
     }
 
-    this.attendanceRepository.merge(attendance, updateData);
-    return await this.attendanceRepository.save(attendance);
+    this.paymentMethodRepository.merge(paymentMethod, updateData);
+    return await this.paymentMethodRepository.save(paymentMethod);
   }
 
   async remove(id: number): Promise<PaymentMethodResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id: id },
     });
-    if (!attendance) {
+    if (!paymentMethod) {
       this.logger.error(`PaymentMethod with ID ${id} not found for deletion`);
       throw new RpcException({
         message: `PaymentMethod with ID ${id} not found`,
@@ -99,7 +101,7 @@ export class PaymentMethodService {
       });
     }
 
-    await this.attendanceRepository.remove(attendance);
-    return attendance;
+    await this.paymentMethodRepository.remove(paymentMethod);
+    return paymentMethod;
   }
 }

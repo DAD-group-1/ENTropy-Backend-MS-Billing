@@ -44,7 +44,7 @@ export class PaymentService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.paymentRepository.findAndCount({
-      relations: { student: true },
+      relations: { user: true },
       skip,
       take: limit,
       order: { id: 'DESC' },
@@ -56,7 +56,10 @@ export class PaymentService {
   async findOne(id: number): Promise<PaymentResponseDto | null> {
     const payment = await this.paymentRepository.findOne({
       where: { id: id },
-      relations: { paymentMethod: true, student: true },
+      relations: {
+        paymentMethod: true,
+        user: true,
+      },
     });
 
     if (!payment) {
@@ -76,11 +79,11 @@ export class PaymentService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.paymentRepository.findAndCount({
-      relations: { paymentMethod: true, student: { user: true } },
+      relations: { paymentMethod: true, user: true },
       skip,
       take: limit,
       order: { id: 'DESC' },
-      where: { student: { user_id: query.id } },
+      where: { user: { id: query.id } },
     });
 
     return new PaymentListResponseDto(data, total, page, limit);

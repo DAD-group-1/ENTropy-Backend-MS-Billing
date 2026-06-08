@@ -7,10 +7,18 @@ import { Payment } from './entities/payment.entity';
 import { Student } from '../external/entities/student.entity';
 import { Campus } from '../external/entities/campus.entity';
 import { User } from '../external/entities/user.entity';
+import { Role } from '../external/entities/role.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PaymentMethod, Payment, Student, User, Campus]),
+    TypeOrmModule.forFeature([
+      PaymentMethod,
+      Payment,
+      Student,
+      User,
+      Campus,
+      Role,
+    ]),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

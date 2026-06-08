@@ -7,6 +7,7 @@ import {
   PaginationQueryDto,
   PaymentListResponseDto,
   PaymentResponseDto,
+  SearchPaginationQueryDto,
   UpdatePaymentRequestDto,
 } from '@dad-group-1/backend-common';
 import { RpcException } from '@nestjs/microservices';
@@ -17,22 +18,22 @@ export class PaymentService {
 
   constructor(
     @InjectRepository(Payment)
-    private attendanceRepository: Repository<Payment>,
+    private paymentRepository: Repository<Payment>,
   ) {}
 
   async create(
     createData: CreatePaymentRequestDto,
   ): Promise<PaymentResponseDto> {
-    const attendance = this.attendanceRepository.create({ ...createData });
+    const payment = this.paymentRepository.create({ ...createData });
     try {
-      return await this.attendanceRepository.save(attendance);
+      return await this.paymentRepository.save(payment);
     } catch (error) {
       this.logger.error(
-        `${error.constructor.name}: Failed to create attendance record - ${error.message}`,
+        `${error.constructor.name}: Failed to create payment record - ${error.message}`,
         error.stack,
       );
       throw new RpcException({
-        message: `Failed to create attendance record`,
+        message: `Failed to create payment record`,
         code: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }
@@ -42,7 +43,7 @@ export class PaymentService {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.attendanceRepository.findAndCount({
+    const [data, total] = await this.paymentRepository.findAndCount({
       relations: { student: true },
       skip,
       take: limit,
@@ -53,29 +54,46 @@ export class PaymentService {
   }
 
   async findOne(id: number): Promise<PaymentResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const payment = await this.paymentRepository.findOne({
       where: { id: id },
       relations: { paymentMethod: true, student: true },
     });
 
-    if (!attendance) {
+    if (!payment) {
       throw new RpcException({
         message: `Payment with ID ${id} not found`,
         code: HttpStatus.NOT_FOUND,
       });
     }
 
-    return attendance;
+    return payment;
+  }
+
+  async findAllByStudent(
+    query: SearchPaginationQueryDto,
+  ): Promise<PaymentListResponseDto> {
+    const { page, limit } = query.query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.paymentRepository.findAndCount({
+      relations: { paymentMethod: true, student: { user: true } },
+      skip,
+      take: limit,
+      order: { id: 'DESC' },
+      where: { student: { user_id: query.id } },
+    });
+
+    return new PaymentListResponseDto(data, total, page, limit);
   }
 
   async update(
     id: number,
     updateData: UpdatePaymentRequestDto,
   ): Promise<PaymentResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const payment = await this.paymentRepository.findOne({
       where: { id: id },
     });
-    if (!attendance) {
+    if (!payment) {
       this.logger.error(`Payment with ID ${id} not found for update`);
       throw new RpcException({
         message: `Payment with ID ${id} not found`,
@@ -83,15 +101,15 @@ export class PaymentService {
       });
     }
 
-    this.attendanceRepository.merge(attendance, updateData);
-    return await this.attendanceRepository.save(attendance);
+    this.paymentRepository.merge(payment, updateData);
+    return await this.paymentRepository.save(payment);
   }
 
   async remove(id: number): Promise<PaymentResponseDto | null> {
-    const attendance = await this.attendanceRepository.findOne({
+    const payment = await this.paymentRepository.findOne({
       where: { id: id },
     });
-    if (!attendance) {
+    if (!payment) {
       this.logger.error(`Payment with ID ${id} not found for deletion`);
       throw new RpcException({
         message: `Payment with ID ${id} not found`,
@@ -99,7 +117,7 @@ export class PaymentService {
       });
     }
 
-    await this.attendanceRepository.remove(attendance);
-    return attendance;
+    await this.paymentRepository.remove(payment);
+    return payment;
   }
 }

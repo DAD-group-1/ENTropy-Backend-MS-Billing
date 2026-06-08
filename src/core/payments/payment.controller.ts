@@ -1,6 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { CreatePaymentRequestDto, PaginationQueryDto, UpdatePaymentRequestDto, } from '@dad-group-1/backend-common';
+import {
+  CreatePaymentRequestDto,
+  PaginationQueryDto,
+  SearchPaginationQueryDto,
+  UpdatePaymentRequestDto,
+} from '@dad-group-1/backend-common';
 import { PaymentService } from './payment.service';
 
 @Controller('payment')
@@ -14,13 +19,18 @@ export class PaymentController {
   }
 
   @MessagePattern({ cmd: 'find_all_payments' })
-  findAll(query: PaginationQueryDto) {
+  findAll(@Payload() query: PaginationQueryDto) {
     return this.paymentService.findAll(query);
   }
 
   @MessagePattern({ cmd: 'find_one_payment' })
   findOne(@Payload() id: number) {
     return this.paymentService.findOne(id);
+  }
+
+  @MessagePattern({ cmd: 'find_payments_by_student_id' })
+  findAllByStudent(@Payload() query: SearchPaginationQueryDto) {
+    return this.paymentService.findAllByStudent(query);
   }
 
   @MessagePattern({ cmd: 'update_payment' })

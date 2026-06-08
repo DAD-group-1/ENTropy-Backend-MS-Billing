@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { InternalUser } from '@dad-group-1/backend-common';
 import { Campus } from './campus.entity';
 import { Student } from './student.entity';
@@ -8,5 +8,6 @@ export class User extends InternalUser {
   @OneToOne(() => Student, (student) => student.user)
   student: Student;
   @ManyToOne(() => Campus, (campus) => campus.users)
+  @JoinColumn({ name: 'campus_id' })
   campus: Campus;
 }

@@ -4,6 +4,6 @@ import { Payment } from '../../payments/entities/payment.entity';
 
 @Entity()
 export class PaymentMethod extends InternalPaymentMethod {
-  @OneToMany(() => Payment, (payment) => payment.paymentMethod)
+  @OneToMany(() => Payment, (payment) => payment.payment_method)
   payments: Payment[];
 }

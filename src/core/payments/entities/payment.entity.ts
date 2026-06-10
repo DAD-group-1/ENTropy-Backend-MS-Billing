@@ -10,5 +10,5 @@ export class Payment extends InternalPayment {
   user: User;
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.payments)
   @JoinColumn({ name: 'payment_method_id' })
-  paymentMethod: PaymentMethod;
+  payment_method: PaymentMethod;
 }

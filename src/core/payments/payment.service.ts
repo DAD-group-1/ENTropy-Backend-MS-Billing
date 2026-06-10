@@ -44,7 +44,7 @@ export class PaymentService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.paymentRepository.findAndCount({
-      relations: { user: true },
+      relations: { user: true, payment_method: true },
       skip,
       take: limit,
       order: { id: 'DESC' },
@@ -57,7 +57,7 @@ export class PaymentService {
     const payment = await this.paymentRepository.findOne({
       where: { id: id },
       relations: {
-        paymentMethod: true,
+        payment_method: true,
         user: true,
       },
     });
@@ -79,7 +79,7 @@ export class PaymentService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await this.paymentRepository.findAndCount({
-      relations: { paymentMethod: true, user: true },
+      relations: { payment_method: true, user: true },
       skip,
       take: limit,
       order: { id: 'DESC' },

@@ -1,0 +1,10 @@
+services:
+  entropy-backend-ms-billing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: entropy_backend_ms_billing
+    ports:
+      - '3003:3003'
+
+

@@ -15,16 +15,19 @@ export class PaymentController {
 
   @MessagePattern({ cmd: 'create_payment' })
   async create(@Payload() data: CreatePaymentRequestDto) {
+    this.logger.log('Creating payment request received');
     return this.paymentService.create(data);
   }
 
   @MessagePattern({ cmd: 'find_all_payments' })
   findAll(@Payload() query: PaginationQueryDto) {
+    this.logger.log('Finding all payments request received');
     return this.paymentService.findAll(query);
   }
 
   @MessagePattern({ cmd: 'find_one_payment' })
   findOne(@Payload() id: number) {
+    this.logger.log('Finding one payment request received for ID: ' + id);
     return this.paymentService.findOne(id);
   }
 
@@ -41,11 +44,13 @@ export class PaymentController {
       updateData: UpdatePaymentRequestDto;
     },
   ) {
+    this.logger.log('Updating payment request received for ID: ' + payload.id);
     return this.paymentService.update(payload.id, payload.updateData);
   }
 
   @MessagePattern({ cmd: 'remove_payment' })
   remove(@Payload() id: number) {
+    this.logger.log('Removing payment request received for ID: ' + id);
     return this.paymentService.remove(id);
   }
 }
